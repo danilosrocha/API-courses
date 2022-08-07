@@ -1,0 +1,56 @@
+service: course
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+
+  environment:
+    COURSE_TABLE: course-${sls:stage}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:us-east-1:*:table/course-dev"
+
+functions:
+  findAll:
+    handler: src/controllers/findAll.handler
+    events:
+      - httpApi:
+          path: /courses
+          method: get
+
+  findById:
+    handler: src/controllers/findById.handler
+    events:
+      - httpApi:
+          path: /courses/{id}
+          method: get
+
+  save:
+    handler: src/controllers/save.handler
+    events:
+      - httpApi:
+          path: /courses
+          method: post
+
+  update:
+    handler: src/controllers/update.handler
+    events:
+      - httpApi:
+          path: /courses/{id}
+          method: put
+
+  remove:
+    handler: src/controllers/remove.handler
+    events:
+      - httpApi:
+          path: /courses/{id}
+          method: delete
